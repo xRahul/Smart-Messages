@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">Smart Messages</string>
+    <string-array name="from_sms">
+        <item>VM-SHOPMT</item>
+        <item>VK-SHOPMT</item>
+        <item>AD-MYNTRA</item>
+        <item>AM-SCLUES</item>
+    </string-array>
 </resources>

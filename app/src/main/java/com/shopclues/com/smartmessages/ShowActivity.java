@@ -25,6 +25,10 @@ import android.view.ViewGroup;
 
 import android.widget.TextView;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -49,6 +53,7 @@ public class ShowActivity extends AppCompatActivity {
     private String[] from_sms;
     private String[] bucket_names;
     private ArrayList<Map<String, String>> listOfMaps;
+    private ArrayList<Map<String, String>> listOfBuckets;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,8 +85,39 @@ public class ShowActivity extends AppCompatActivity {
 //            }
 //        });
 
-        read_all_sms();
+        listOfBuckets = new ArrayList<Map<String, String>>();
+        for (int j = 0; j < bucket_names.length; j++) {
+            Map<String, String> tempBucket = new HashMap<>();
+            tempBucket.put("name", bucket_names[j]);
+            tempBucket.put("count", "0");
+            listOfBuckets.add(tempBucket);
+        }
+        Log.d("SM/lb", listOfBuckets.toString());
 
+        read_all_sms();
+        bucketize_sms_from_api();
+
+    }
+
+    private void bucketize_sms_from_api() {
+
+        for (int i = 0; i < listOfMaps.size(); i++) {
+            Map<String, String> tempSms = new HashMap<>();
+            tempSms.put("from", listOfMaps.get(i).get("from"));
+            tempSms.put("body", listOfMaps.get(i).get("body"));
+            tempSms.put("time", listOfMaps.get(i).get("time"));
+            tempSms.put("bucketId", String.valueOf(2));
+            listOfMaps.set(i, tempSms);
+
+
+
+            Map<String, String> tempBucket = new HashMap<>();
+            tempBucket.put("name", listOfBuckets.get(2).get("name"));
+            tempBucket.put("count", String.valueOf(Integer.parseInt(listOfBuckets.get(2).get("count")) + 1));
+            listOfBuckets.set(2, tempBucket);
+
+        }
+        Log.d("SM/lb", listOfMaps.toString());
     }
 
 
@@ -116,6 +152,8 @@ public class ShowActivity extends AppCompatActivity {
          * fragment.
          */
         private static final String ARG_SECTION_NUMBER = "section_number";
+        private static final String ARG_BUCKETS_LIST = "temp_buckets_list";
+        private static final String ARG_SMS_LIST = "temp_sms_list";
 
         public PlaceholderFragment() {
         }
@@ -124,11 +162,13 @@ public class ShowActivity extends AppCompatActivity {
          * Returns a new instance of this fragment for the given section
          * number.
          */
-        public static PlaceholderFragment newInstance(int sectionNumber, ArrayList<Map<String, String>> tempListOfSms) {
+        public static PlaceholderFragment newInstance(int sectionNumber, ArrayList<Map<String, String>> tempListOfSms, ArrayList<Map<String, String>> tempListOfBuckets) {
             PlaceholderFragment fragment = new PlaceholderFragment();
             Bundle args = new Bundle();
             args.putInt(ARG_SECTION_NUMBER, sectionNumber);
-            args.putSerializable("temp_list", tempListOfSms);
+            args.putSerializable(ARG_SMS_LIST, tempListOfSms);
+            Log.d("QWERTY", tempListOfBuckets.toString());
+            args.putSerializable(ARG_BUCKETS_LIST, tempListOfBuckets);
             fragment.setArguments(args);
             return fragment;
         }
@@ -152,15 +192,19 @@ public class ShowActivity extends AppCompatActivity {
 
         private View createBucketsView(LayoutInflater inflater, ViewGroup container,
                                        Bundle savedInstanceState) {
-            View rootView = inflater.inflate(R.layout.fragment_show, container, false);
-            TextView textView = (TextView) rootView.findViewById(R.id.section_label);
-            textView.setText(getString(R.string.section_format, getArguments().getInt(ARG_SECTION_NUMBER)));
+            BucketListArrayAdapter itemsAdapter = new BucketListArrayAdapter(this.getContext(), (ArrayList<Map<String, String>>)getArguments().getSerializable(ARG_BUCKETS_LIST));
+            View rootView = inflater.inflate(R.layout.buckets_tab, container, false);
+            RecyclerView listView = (RecyclerView) rootView.findViewById(R.id.buckets_list_view);
+            listView.setLayoutManager(new LinearLayoutManager(this.getContext()));
+            listView.setHasFixedSize(true);
+            listView.setAdapter(itemsAdapter);
             return rootView;
         }
 
+
         private View createSmsView(LayoutInflater inflater, ViewGroup container,
                                    Bundle savedInstanceState) {
-            SmsListArrayAdapter itemsAdapter = new SmsListArrayAdapter(this.getContext(), (ArrayList<Map<String, String>>)getArguments().getSerializable("temp_list"));
+            SmsListArrayAdapter itemsAdapter = new SmsListArrayAdapter(this.getContext(), (ArrayList<Map<String, String>>)getArguments().getSerializable(ARG_SMS_LIST));
             View rootView = inflater.inflate(R.layout.sms_tab, container, false);
             RecyclerView listView = (RecyclerView) rootView.findViewById(R.id.sms_list_view);
             listView.setLayoutManager(new LinearLayoutManager(this.getContext()));
@@ -184,7 +228,7 @@ public class ShowActivity extends AppCompatActivity {
         public Fragment getItem(int position) {
             // getItem is called to instantiate the fragment for the given page.
             // Return a PlaceholderFragment (defined as a static inner class below).
-            return PlaceholderFragment.newInstance(position, listOfMaps);
+            return PlaceholderFragment.newInstance(position, listOfMaps, listOfBuckets);
         }
 
         @Override
@@ -235,7 +279,7 @@ public class ShowActivity extends AppCompatActivity {
                     tempSms.put("from", strAddress);
                     tempSms.put("body", strbody);
                     tempSms.put("time", String.valueOf(longDate));
-                    tempSms.put("key", (strAddress + strbody).hashCode());
+//                    tempSms.put("key", (strAddress + strbody).hashCode());
 
                     listOfMaps.add(tempSms);
 

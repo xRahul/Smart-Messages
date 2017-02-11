@@ -4,26 +4,23 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteException;
 import android.net.Uri;
+import android.os.Bundle;
 import android.support.design.widget.TabLayout;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
-
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-
 import android.widget.TextView;
-import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -32,6 +29,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 public class ShowActivity extends AppCompatActivity {
 
@@ -99,24 +97,27 @@ public class ShowActivity extends AppCompatActivity {
 
     }
 
-    private void bucketize_sms_from_api() {
+    private void bucketize_sms_from_api()  {
 
         try {
             JSONObject mainObj = new JSONObject();
-            mainObj.put("uid", 12111111);
+            mainObj.put("uid", UUID.randomUUID().toString());
             mainObj.put("predict", "True");
+
+            JSONArray dataArray = new JSONArray();
+
+            for (int i = 0; i < listOfSms.size(); i++) {
+                JSONObject tempSms = new JSONObject();
+                tempSms.put("msg_from", listOfSms.get(i).get("from"));
+                tempSms.put("msg", listOfSms.get(i).get("body"));
+                dataArray.put(tempSms);
+            }
+
+            mainObj.put("data", dataArray);
+
         } catch (JSONException e) {
 
         }
-
-
-        JSONArray dataArray = new JSONArray();
-
-        for (int i = 0; i < listOfSms.size(); i++) {
-            JSONObject tempSms = new JSONObject();
-            tempSms.put()
-        }
-
 
         for (int i = 0; i < listOfSms.size(); i++) {
             Map<String, String> tempSms = new HashMap<>();

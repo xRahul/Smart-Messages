@@ -33,25 +33,9 @@ import java.util.UUID;
 
 public class ShowActivity extends AppCompatActivity {
 
-    /**
-     * The {@link android.support.v4.view.PagerAdapter} that will provide
-     * fragments for each of the sections. We use a
-     * {@link FragmentPagerAdapter} derivative, which will keep every
-     * loaded fragment in memory. If this becomes too memory intensive, it
-     * may be best to switch to a
-     * {@link android.support.v4.app.FragmentStatePagerAdapter}.
-     */
-    private SectionsPagerAdapter mSectionsPagerAdapter;
-
-    /**
-     * The {@link ViewPager} that will host the section contents.
-     */
-    private ViewPager mViewPager;
     private String[] from_sms;
-    private String[] bucket_names;
     public ArrayList<Map<String, String>> listOfSms;
     public ArrayList<Map<String, String>> listOfBuckets;
-    private BucketListArrayAdapter itemsAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,34 +43,37 @@ public class ShowActivity extends AppCompatActivity {
         setContentView(R.layout.activity_show);
 
         from_sms = getResources().getStringArray(R.array.from_sms);
-        bucket_names = getResources().getStringArray(R.array.buckets);
+        String[] bucket_names = getResources().getStringArray(R.array.buckets);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         // Create the adapter that will return a fragment for each of the three
         // primary sections of the activity.
-        mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
+        /*
+      The {@link android.support.v4.view.PagerAdapter} that will provide
+      fragments for each of the sections. We use a
+      {@link FragmentPagerAdapter} derivative, which will keep every
+      loaded fragment in memory. If this becomes too memory intensive, it
+      may be best to switch to a
+      {@link android.support.v4.app.FragmentStatePagerAdapter}.
+     */
+        SectionsPagerAdapter mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
 
         // Set up the ViewPager with the sections adapter.
-        mViewPager = (ViewPager) findViewById(R.id.container);
+        /*
+      The {@link ViewPager} that will host the section contents.
+     */
+        ViewPager mViewPager = (ViewPager) findViewById(R.id.container);
         mViewPager.setAdapter(mSectionsPagerAdapter);
 
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(mViewPager);
 
-//        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-//        fab.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-//                        .setAction("Action", null).show();
-//            }
-//        });
 
-        listOfBuckets = new ArrayList<Map<String, String>>();
-        for (int j = 0; j < bucket_names.length; j++) {
+        listOfBuckets = new ArrayList<>();
+        for (String bucket_name : bucket_names) {
             Map<String, String> tempBucket = new HashMap<>();
-            tempBucket.put("name", bucket_names[j]);
+            tempBucket.put("name", bucket_name);
             tempBucket.put("count", "0");
             listOfBuckets.add(tempBucket);
         }
@@ -116,7 +103,7 @@ public class ShowActivity extends AppCompatActivity {
             mainObj.put("data", dataArray);
 
         } catch (JSONException e) {
-
+            // empty
         }
 
         for (int i = 0; i < listOfSms.size(); i++) {
@@ -172,8 +159,6 @@ public class ShowActivity extends AppCompatActivity {
         private static final String ARG_SECTION_NUMBER = "section_number";
         private static final String ARG_BUCKETS_LIST = "temp_buckets_list";
         private static final String ARG_SMS_LIST = "temp_sms_list";
-        private static BucketListArrayAdapter bucketItemsAdapter;
-        private static SmsListArrayAdapter itemsAdapter;
 
         public PlaceholderFragment() {
         }
@@ -198,9 +183,9 @@ public class ShowActivity extends AppCompatActivity {
                                  Bundle savedInstanceState) {
             switch (getArguments().getInt(ARG_SECTION_NUMBER)) {
                 case 0:
-                    return createBucketsView(inflater, container, savedInstanceState);
+                    return createBucketsView(inflater, container);
                 case 1:
-                    return createSmsView(inflater, container, savedInstanceState);
+                    return createSmsView(inflater, container);
             }
 
             // if not both
@@ -210,9 +195,8 @@ public class ShowActivity extends AppCompatActivity {
             return rootView;
         }
 
-        private View createBucketsView(LayoutInflater inflater, ViewGroup container,
-                                       Bundle savedInstanceState) {
-            bucketItemsAdapter = new BucketListArrayAdapter(this.getContext(), (ArrayList<Map<String, String>>)getArguments().getSerializable(ARG_BUCKETS_LIST));
+        private View createBucketsView(LayoutInflater inflater, ViewGroup container) {
+            BucketListArrayAdapter bucketItemsAdapter = new BucketListArrayAdapter(this.getContext(), (ArrayList<Map<String, String>>)getArguments().getSerializable(ARG_BUCKETS_LIST));
             View rootView = inflater.inflate(R.layout.buckets_tab, container, false);
             RecyclerView listView = (RecyclerView) rootView.findViewById(R.id.buckets_list_view);
             listView.setLayoutManager(new LinearLayoutManager(this.getContext()));
@@ -222,14 +206,13 @@ public class ShowActivity extends AppCompatActivity {
         }
 
 
-        private View createSmsView(LayoutInflater inflater, ViewGroup container,
-                                   Bundle savedInstanceState) {
-            itemsAdapter = new SmsListArrayAdapter(this.getContext(), (ArrayList<Map<String, String>>)getArguments().getSerializable(ARG_SMS_LIST));
+        private View createSmsView(LayoutInflater inflater, ViewGroup container) {
+            SmsListArrayAdapter smsListAdapter = new SmsListArrayAdapter(this.getContext(), (ArrayList<Map<String, String>>)getArguments().getSerializable(ARG_SMS_LIST));
             View rootView = inflater.inflate(R.layout.sms_tab, container, false);
             RecyclerView listView = (RecyclerView) rootView.findViewById(R.id.sms_list_view);
             listView.setLayoutManager(new LinearLayoutManager(this.getContext()));
             listView.setHasFixedSize(true);
-            listView.setAdapter(itemsAdapter);
+            listView.setAdapter(smsListAdapter);
             return rootView;
         }
     }
@@ -240,7 +223,7 @@ public class ShowActivity extends AppCompatActivity {
      */
     public class SectionsPagerAdapter extends FragmentPagerAdapter {
 
-        public SectionsPagerAdapter(FragmentManager fm) {
+        SectionsPagerAdapter(FragmentManager fm) {
             super(fm);
         }
 
@@ -271,7 +254,7 @@ public class ShowActivity extends AppCompatActivity {
 
     private void read_all_sms() {
         final String SMS_URI_INBOX = "content://sms/inbox";
-        listOfSms = new ArrayList<Map<String, String>>();
+        listOfSms = new ArrayList<>();
         try {
             Uri uri = Uri.parse(SMS_URI_INBOX);
             String[] projection = new String[] { "_id", "address", "body", "date" };

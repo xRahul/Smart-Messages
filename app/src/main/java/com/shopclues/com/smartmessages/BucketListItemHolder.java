@@ -46,7 +46,7 @@ class BucketListItemHolder extends RecyclerView.ViewHolder implements View.OnCli
     @Override
     public void onClick(View v) {
         // 5. Handle the onClick event for the ViewHolder
-//        if (this.sms != null) {
+//        if (Integer.parseInt(bucket.get("count")_ != 0) {
 //            ClipboardManager clipboard = (ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
 //            ClipData clip = ClipData.newPlainText("sms", this.sms.get("body"));
 //            clipboard.setPrimaryClip(clip);

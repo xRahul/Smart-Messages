@@ -11,12 +11,13 @@
         <item>+919560399002</item>
     </string-array>
     <string-array name="buckets">
+        <item>None</item>
         <item>Critical</item>
         <item>Error</item>
         <item>Debug</item>
         <item>Info</item>
     </string-array>
-    <string name="title_activity_show">ShowActivity</string>
+    <string name="title_activity_show">Smart Messages</string>
     <string name="action_settings">Settings</string>
     <string name="section_format">Hello World from section: %1$d</string>
 </resources>

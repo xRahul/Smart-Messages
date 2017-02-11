@@ -1,11 +1,10 @@
 package com.shopclues.com.smartmessages;
 
+import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteException;
 import android.net.Uri;
 import android.support.design.widget.TabLayout;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -24,14 +23,14 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import android.widget.TextView;
+import android.widget.Toast;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.net.URL;
-import java.net.URLConnection;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class ShowActivity extends AppCompatActivity {
@@ -52,8 +51,9 @@ public class ShowActivity extends AppCompatActivity {
     private ViewPager mViewPager;
     private String[] from_sms;
     private String[] bucket_names;
-    private ArrayList<Map<String, String>> listOfMaps;
-    private ArrayList<Map<String, String>> listOfBuckets;
+    public ArrayList<Map<String, String>> listOfSms;
+    public ArrayList<Map<String, String>> listOfBuckets;
+    private BucketListArrayAdapter itemsAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -101,13 +101,30 @@ public class ShowActivity extends AppCompatActivity {
 
     private void bucketize_sms_from_api() {
 
-        for (int i = 0; i < listOfMaps.size(); i++) {
+        try {
+            JSONObject mainObj = new JSONObject();
+            mainObj.put("uid", 12111111);
+            mainObj.put("predict", "True");
+        } catch (JSONException e) {
+
+        }
+
+
+        JSONArray dataArray = new JSONArray();
+
+        for (int i = 0; i < listOfSms.size(); i++) {
+            JSONObject tempSms = new JSONObject();
+            tempSms.put()
+        }
+
+
+        for (int i = 0; i < listOfSms.size(); i++) {
             Map<String, String> tempSms = new HashMap<>();
-            tempSms.put("from", listOfMaps.get(i).get("from"));
-            tempSms.put("body", listOfMaps.get(i).get("body"));
-            tempSms.put("time", listOfMaps.get(i).get("time"));
+            tempSms.put("from", listOfSms.get(i).get("from"));
+            tempSms.put("body", listOfSms.get(i).get("body"));
+            tempSms.put("time", listOfSms.get(i).get("time"));
             tempSms.put("bucketId", String.valueOf(2));
-            listOfMaps.set(i, tempSms);
+            listOfSms.set(i, tempSms);
 
 
 
@@ -117,7 +134,7 @@ public class ShowActivity extends AppCompatActivity {
             listOfBuckets.set(2, tempBucket);
 
         }
-        Log.d("SM/lb", listOfMaps.toString());
+        Log.d("SM/lb", listOfSms.toString());
     }
 
 
@@ -154,6 +171,8 @@ public class ShowActivity extends AppCompatActivity {
         private static final String ARG_SECTION_NUMBER = "section_number";
         private static final String ARG_BUCKETS_LIST = "temp_buckets_list";
         private static final String ARG_SMS_LIST = "temp_sms_list";
+        private static BucketListArrayAdapter bucketItemsAdapter;
+        private static SmsListArrayAdapter itemsAdapter;
 
         public PlaceholderFragment() {
         }
@@ -192,19 +211,19 @@ public class ShowActivity extends AppCompatActivity {
 
         private View createBucketsView(LayoutInflater inflater, ViewGroup container,
                                        Bundle savedInstanceState) {
-            BucketListArrayAdapter itemsAdapter = new BucketListArrayAdapter(this.getContext(), (ArrayList<Map<String, String>>)getArguments().getSerializable(ARG_BUCKETS_LIST));
+            bucketItemsAdapter = new BucketListArrayAdapter(this.getContext(), (ArrayList<Map<String, String>>)getArguments().getSerializable(ARG_BUCKETS_LIST));
             View rootView = inflater.inflate(R.layout.buckets_tab, container, false);
             RecyclerView listView = (RecyclerView) rootView.findViewById(R.id.buckets_list_view);
             listView.setLayoutManager(new LinearLayoutManager(this.getContext()));
             listView.setHasFixedSize(true);
-            listView.setAdapter(itemsAdapter);
+            listView.setAdapter(bucketItemsAdapter);
             return rootView;
         }
 
 
         private View createSmsView(LayoutInflater inflater, ViewGroup container,
                                    Bundle savedInstanceState) {
-            SmsListArrayAdapter itemsAdapter = new SmsListArrayAdapter(this.getContext(), (ArrayList<Map<String, String>>)getArguments().getSerializable(ARG_SMS_LIST));
+            itemsAdapter = new SmsListArrayAdapter(this.getContext(), (ArrayList<Map<String, String>>)getArguments().getSerializable(ARG_SMS_LIST));
             View rootView = inflater.inflate(R.layout.sms_tab, container, false);
             RecyclerView listView = (RecyclerView) rootView.findViewById(R.id.sms_list_view);
             listView.setLayoutManager(new LinearLayoutManager(this.getContext()));
@@ -228,7 +247,7 @@ public class ShowActivity extends AppCompatActivity {
         public Fragment getItem(int position) {
             // getItem is called to instantiate the fragment for the given page.
             // Return a PlaceholderFragment (defined as a static inner class below).
-            return PlaceholderFragment.newInstance(position, listOfMaps, listOfBuckets);
+            return PlaceholderFragment.newInstance(position, listOfSms, listOfBuckets);
         }
 
         @Override
@@ -251,7 +270,7 @@ public class ShowActivity extends AppCompatActivity {
 
     private void read_all_sms() {
         final String SMS_URI_INBOX = "content://sms/inbox";
-        listOfMaps = new ArrayList<Map<String, String>>();
+        listOfSms = new ArrayList<Map<String, String>>();
         try {
             Uri uri = Uri.parse(SMS_URI_INBOX);
             String[] projection = new String[] { "_id", "address", "body", "date" };
@@ -281,11 +300,11 @@ public class ShowActivity extends AppCompatActivity {
                     tempSms.put("time", String.valueOf(longDate));
 //                    tempSms.put("key", (strAddress + strbody).hashCode());
 
-                    listOfMaps.add(tempSms);
+                    listOfSms.add(tempSms);
 
                 } while (cur.moveToNext());
 
-                Log.d("SM/SizeMsgs", String.valueOf(listOfMaps.size()));
+                Log.d("SM/SizeMsgs", String.valueOf(listOfSms.size()));
 
                 if (!cur.isClosed()) {
                     cur.close();
@@ -294,6 +313,37 @@ public class ShowActivity extends AppCompatActivity {
             }
         } catch (SQLiteException ex) {
             Log.d("SQLiteException", ex.getMessage());
+        }
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        switch(requestCode) {
+            case (111) : {
+                if (resultCode == RESULT_OK) {
+                    Integer bucketId = data.getIntExtra("bucketId", 0);
+                    Integer smsPosition = data.getIntExtra("smsPosition", 0);
+                    Integer oldBucketId = data.getIntExtra("old_bucket_id", 0);
+
+                    Log.d("SH/asdf", String.valueOf(bucketId)+String.valueOf(smsPosition)+String.valueOf(oldBucketId));
+
+                    Map<String, String> tempSms = new HashMap<>();
+                    tempSms.put("from", listOfSms.get(smsPosition).get("from"));
+                    tempSms.put("body", listOfSms.get(smsPosition).get("body"));
+                    tempSms.put("time", listOfSms.get(smsPosition).get("time"));
+                    tempSms.put("bucketId", String.valueOf(bucketId));
+                    listOfSms.set(smsPosition, tempSms);
+
+                    Map<String, String> tempBucket = new HashMap<>();
+                    tempBucket.put("name", listOfBuckets.get(oldBucketId).get("name"));
+                    tempBucket.put("count", String.valueOf(Integer.parseInt(listOfBuckets.get(oldBucketId).get("count")) + 1));
+                    listOfBuckets.set(oldBucketId, tempBucket);
+
+
+                }
+                break;
+            }
         }
     }
 

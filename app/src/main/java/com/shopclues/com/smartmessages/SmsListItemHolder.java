@@ -3,12 +3,16 @@ package com.shopclues.com.smartmessages;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
+import android.content.Intent;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Map;
 
@@ -18,9 +22,11 @@ class SmsListItemHolder extends RecyclerView.ViewHolder implements View.OnClickL
     private final TextView smsBodyTextView;
     private final TextView smsFromTextView;
     private final TextView smsTimeTextView;
+    private final Button smsBucketButton;
 
     private Map<String, String> sms;
     private Context context;
+    private String[] bucket_names;
 
     SmsListItemHolder(Context contextTemp, View itemView) {
         super(itemView);
@@ -32,6 +38,8 @@ class SmsListItemHolder extends RecyclerView.ViewHolder implements View.OnClickL
         smsBodyTextView = (TextView) itemView.findViewById(R.id.sms_body_textview);
         smsFromTextView = (TextView) itemView.findViewById(R.id.sms_from_textview);
         smsTimeTextView = (TextView) itemView.findViewById(R.id.sms_time_textview);
+        smsBucketButton = (Button) itemView.findViewById(R.id.bucket_button);
+        bucket_names = context.getResources().getStringArray(R.array.buckets);
 
         // 3. Set the "onClick" listener of the holder
         itemView.setOnClickListener(this);
@@ -51,20 +59,24 @@ class SmsListItemHolder extends RecyclerView.ViewHolder implements View.OnClickL
     void bindSms(Map<String, String> smsTemp) {
         sms = smsTemp;
         // 4. Bind the data to the ViewHolder
-        this.smsBodyTextView.setText(sms.get("body"));
-        this.smsFromTextView.setText(sms.get("from"));
-        this.smsTimeTextView.setText(getDate(Long.parseLong(sms.get("time")), "dd/MM/yyyy hh:mm:ss a"));
-//        this.smsTimeTextView.setText(sms.get("time"));
+        smsBodyTextView.setText(sms.get("body"));
+        smsFromTextView.setText(sms.get("from"));
+        smsTimeTextView.setText(getDate(Long.parseLong(sms.get("time")), "dd/MM/yyyy hh:mm:ss a"));
+        smsBucketButton.setText(bucket_names[Integer.parseInt(sms.get("bucketId"))] + " - " + "Change Bucket");
+
+        smsBucketButton.setOnClickListener(this);
+
     }
 
     @Override
     public void onClick(View v) {
-        // 5. Handle the onClick event for the ViewHolder
-//        if (this.sms != null) {
-//            ClipboardManager clipboard = (ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
-//            ClipData clip = ClipData.newPlainText("sms", this.sms.get("body"));
-//            clipboard.setPrimaryClip(clip);
-//            Toast.makeText(this.context, "Copied Sms- \n" + this.sms.get("body"), Toast.LENGTH_SHORT ).show();
-//        }
+        if (v.getId() == smsBucketButton.getId()){
+            Intent i = new Intent(context, ChooseBucketActivity.class);
+            i.putExtra("sms_position", getAdapterPosition());
+            i.putExtra("old_bucket_id", Integer.parseInt(sms.get("bucketId")));
+            ((AppCompatActivity) context).startActivityForResult(i, 111);
+            Toast.makeText(v.getContext(), "ITEM PRESSED = " + String.valueOf(getAdapterPosition()), Toast.LENGTH_SHORT).show();
+        }
     }
+
 }

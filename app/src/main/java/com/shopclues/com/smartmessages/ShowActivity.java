@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteException;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
@@ -21,21 +22,32 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
+import android.provider.Settings.Secure;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.BufferedReader;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 
 public class ShowActivity extends AppCompatActivity {
 
     private String[] from_sms;
     public ArrayList<Map<String, String>> listOfSms;
     public ArrayList<Map<String, String>> listOfBuckets;
+    public JSONObject jsonPredictData;
+    public JSONObject jsonTrainData;
+    private String android_id;
+    private Boolean predicted = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,6 +56,8 @@ public class ShowActivity extends AppCompatActivity {
 
         from_sms = getResources().getStringArray(R.array.from_sms);
         String[] bucket_names = getResources().getStringArray(R.array.buckets);
+        android_id = Secure.getString(getContentResolver(),
+                Secure.ANDROID_ID);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -86,9 +100,155 @@ public class ShowActivity extends AppCompatActivity {
 
     private void bucketize_sms_from_api()  {
 
+        createPredictData();
+
+        updateSmsListFromPredictions();
+
+        if (predicted == false) {
+            for (int i = 0; i < listOfSms.size(); i++) {
+                Map<String, String> tempSms = new HashMap<>();
+                tempSms.put("from", listOfSms.get(i).get("from"));
+                tempSms.put("body", listOfSms.get(i).get("body"));
+                tempSms.put("time", listOfSms.get(i).get("time"));
+                tempSms.put("bucketId", String.valueOf(0));
+                listOfSms.set(i, tempSms);
+
+
+                Map<String, String> tempBucket = new HashMap<>();
+                tempBucket.put("name", listOfBuckets.get(0).get("name"));
+                tempBucket.put("count", String.valueOf(Integer.parseInt(listOfBuckets.get(0).get("count")) + 1));
+                listOfBuckets.set(0, tempBucket);
+
+            }
+        }
+        Log.d("SM/lb", listOfSms.toString());
+    }
+
+    private void updateSmsListFromPredictions() {
+        new HttpAsyncTask1().execute("http://fqa10.shopclues.com/tools/Smart-Messages/SmartMessages.php");
+    }
+
+    private void hitTrainApi() {
+        new HttpAsyncTask2().execute("http://fqa10.shopclues.com/tools/Smart-Messages/SmartMessages.php");
+    }
+
+
+    public String POST(String urlStr, JSONObject data) {
+        try {
+            BufferedReader br;
+            URL url = new URL(urlStr); //Enter URL here
+            HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
+            httpURLConnection.setDoOutput(true);
+            httpURLConnection.setRequestMethod("POST"); // here you are telling that it is a POST request, which can be changed into "PUT", "GET", "DELETE" etc.
+            httpURLConnection.setRequestProperty("Content-Type", "application/json"); // here you are setting the `Content-Type` for the data you are sending which is `application/json`
+            httpURLConnection.connect();
+
+            DataOutputStream wr = new DataOutputStream(httpURLConnection.getOutputStream());
+            wr.writeBytes(data.toString());
+            wr.flush();
+            wr.close();
+
+            if (200 <= httpURLConnection.getResponseCode() && httpURLConnection.getResponseCode() <= 299) {
+                br = new BufferedReader(new InputStreamReader((httpURLConnection.getInputStream())));
+            } else {
+                br = new BufferedReader(new InputStreamReader((httpURLConnection.getErrorStream())));
+            }
+
+            StringBuilder sb = new StringBuilder();
+            String output;
+            while ((output = br.readLine()) != null) {
+                sb.append(output);
+            }
+            Log.d("qwqwqwqw", sb.toString());
+            Log.d("asasasas", android_id);
+            Log.d("mmmmmmmm", data.toString());
+
+            runOnUiThread(new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    SectionsPagerAdapter mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
+
+                    ViewPager mViewPager = (ViewPager) findViewById(R.id.container);
+                    mViewPager.setAdapter(mSectionsPagerAdapter);
+
+                    TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
+                    tabLayout.setupWithViewPager(mViewPager);
+                }
+            });
+
+            return sb.toString();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return "";
+    }
+
+    public class HttpAsyncTask1 extends AsyncTask<String, Void, String> {
+        @Override
+        protected String doInBackground(String... urls) {
+            predicted = false;
+            return POST(urls[0],jsonPredictData);
+        }
+        // onPostExecute displays the results of the AsyncTask.
+        @Override
+        protected void onPostExecute(String result) {
+            if (result == null) {
+                Toast.makeText(getBaseContext(), "prediction failed!", Toast.LENGTH_LONG).show();
+            } else {
+                try {
+                    JSONArray predict = new JSONArray(result);
+                    for (int i = 0; i < listOfSms.size(); i++)
+                    {
+                        Map<String, String> tempSms = new HashMap<>();
+                        tempSms.put("from", listOfSms.get(i).get("from"));
+                        tempSms.put("body", listOfSms.get(i).get("body"));
+                        tempSms.put("time", listOfSms.get(i).get("time"));
+                        tempSms.put("bucketId", String.valueOf(predict.get(i)));
+                        listOfSms.set(i, tempSms);
+
+                        Map<String, String> tempBucket = new HashMap<>();
+                        tempBucket.put("name", listOfBuckets.get(predict.getInt(i)).get("name"));
+                        tempBucket.put("count", String.valueOf(Integer.parseInt(listOfBuckets.get(predict.getInt(i)).get("count")) + 1));
+                        listOfBuckets.set(predict.getInt(i), tempBucket);
+
+                        tempBucket = new HashMap<>();
+                        tempBucket.put("name", listOfBuckets.get(0).get("name"));
+                        tempBucket.put("count", String.valueOf(Integer.parseInt(listOfBuckets.get(0).get("count")) - 1));
+                        listOfBuckets.set(0, tempBucket);
+
+                        predicted = true;
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+    public class HttpAsyncTask2 extends AsyncTask<String, Void, String> {
+        @Override
+        protected String doInBackground(String... urls) {
+
+            return POST(urls[0],jsonTrainData);
+        }
+        // onPostExecute displays the results of the AsyncTask.
+        @Override
+        protected void onPostExecute(String result) {
+            if (result == null) {
+                Toast.makeText(getBaseContext(), "train failed!", Toast.LENGTH_LONG).show();
+            } else {
+                Toast.makeText(getBaseContext(), "train success!", Toast.LENGTH_LONG).show();
+            }
+        }
+    }
+
+    private void createPredictData() {
         try {
             JSONObject mainObj = new JSONObject();
-            mainObj.put("uid", UUID.randomUUID().toString());
+            mainObj.put("uid", android_id);
             mainObj.put("predict", "True");
 
             JSONArray dataArray = new JSONArray();
@@ -101,28 +261,33 @@ public class ShowActivity extends AppCompatActivity {
             }
 
             mainObj.put("data", dataArray);
+            jsonPredictData = mainObj;
 
         } catch (JSONException e) {
             // empty
         }
+    }
 
-        for (int i = 0; i < listOfSms.size(); i++) {
-            Map<String, String> tempSms = new HashMap<>();
-            tempSms.put("from", listOfSms.get(i).get("from"));
-            tempSms.put("body", listOfSms.get(i).get("body"));
-            tempSms.put("time", listOfSms.get(i).get("time"));
-            tempSms.put("bucketId", String.valueOf(2));
-            listOfSms.set(i, tempSms);
+    private void createTrainData(Map<String, String> trainMap) {
+        try {
+            JSONObject mainObj = new JSONObject();
+            mainObj.put("uid", android_id);
+            mainObj.put("predict", "False");
 
+            JSONArray dataArray = new JSONArray();
 
+            JSONObject tempSms = new JSONObject();
+            tempSms.put("msg_from", trainMap.get("from"));
+            tempSms.put("msg", trainMap.get("body"));
+            tempSms.put("bucket_id", trainMap.get("bucketId"));
+            dataArray.put(tempSms);
 
-            Map<String, String> tempBucket = new HashMap<>();
-            tempBucket.put("name", listOfBuckets.get(2).get("name"));
-            tempBucket.put("count", String.valueOf(Integer.parseInt(listOfBuckets.get(2).get("count")) + 1));
-            listOfBuckets.set(2, tempBucket);
+            mainObj.put("data", dataArray);
+            jsonTrainData = mainObj;
 
+        } catch (JSONException e) {
+            // empty
         }
-        Log.d("SM/lb", listOfSms.toString());
     }
 
 
@@ -319,9 +484,16 @@ public class ShowActivity extends AppCompatActivity {
                     tempSms.put("bucketId", String.valueOf(bucketId));
                     listOfSms.set(smsPosition, tempSms);
 
+                    createTrainData(tempSms);
+                    hitTrainApi();
+
                     Map<String, String> tempBucket = new HashMap<>();
+                    tempBucket.put("name", listOfBuckets.get(bucketId).get("name"));
+                    tempBucket.put("count", String.valueOf(Integer.parseInt(listOfBuckets.get(bucketId).get("count")) + 1));
+                    listOfBuckets.set(bucketId, tempBucket);
+                    tempBucket = new HashMap<>();
                     tempBucket.put("name", listOfBuckets.get(oldBucketId).get("name"));
-                    tempBucket.put("count", String.valueOf(Integer.parseInt(listOfBuckets.get(oldBucketId).get("count")) + 1));
+                    tempBucket.put("count", String.valueOf(Integer.parseInt(listOfBuckets.get(oldBucketId).get("count")) - 1));
                     listOfBuckets.set(oldBucketId, tempBucket);
 
 

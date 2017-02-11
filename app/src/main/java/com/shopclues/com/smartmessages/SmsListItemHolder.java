@@ -4,6 +4,7 @@ import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
@@ -75,6 +76,27 @@ class SmsListItemHolder extends RecyclerView.ViewHolder implements View.OnClickL
         }
         else if (bucket_names[Integer.parseInt(sms.get("bucketId"))] == "Personal") {
             smsBucketButton.setBackgroundResource(R.color.yellow);
+        }
+
+        if (bucket_names[Integer.parseInt(sms.get("bucketId"))].equals("Critical"))
+        {
+            smsBucketButton.setBackgroundColor(Color.RED);
+        }
+        else if (bucket_names[Integer.parseInt(sms.get("bucketId"))].equals("None"))
+        {
+            smsBucketButton.setBackgroundColor(Color.GRAY);
+        }
+        else if (bucket_names[Integer.parseInt(sms.get("bucketId"))].equals("Info"))
+        {
+            smsBucketButton.setBackgroundColor(Color.GREEN);
+        }
+        else if (bucket_names[Integer.parseInt(sms.get("bucketId"))].equals("Debug"))
+        {
+            smsBucketButton.setBackgroundColor(Color.BLUE);
+        }
+        else if (bucket_names[Integer.parseInt(sms.get("bucketId"))].equals("Error"))
+        {
+            smsBucketButton.setBackgroundColor(Color.YELLOW);
         }
 
         smsBucketButton.setOnClickListener(this);

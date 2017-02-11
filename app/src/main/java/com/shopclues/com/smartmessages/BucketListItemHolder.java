@@ -1,6 +1,7 @@
 package com.shopclues.com.smartmessages;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
@@ -43,21 +44,25 @@ class BucketListItemHolder extends RecyclerView.ViewHolder implements View.OnCli
         bucketNameTextView.setText(bucket.get("name"));
         bucketCountTextView.setText(bucket.get("count"));
 
-        if (bucket.get("name") == "Critical")
+        if (bucket.get("name").equals("Critical"))
         {
-            bucket_list_view_parent.setBackgroundResource(R.color.red);
+            bucket_list_view_parent.setBackgroundColor(Color.RED);
         }
-        else if (bucket.get("name") == "Info")
+        else if (bucket.get("name").equals("None"))
         {
-            bucket_list_view_parent.setBackgroundResource(R.color.blue);
+            bucket_list_view_parent.setBackgroundColor(Color.GRAY);
         }
-        else if (bucket.get("name") == "Debug")
+        else if (bucket.get("name").equals("Info"))
         {
-            bucket_list_view_parent.setBackgroundResource(R.color.green);
+            bucket_list_view_parent.setBackgroundColor(Color.GREEN);
         }
-        else if (bucket.get("name") == "Personal")
+        else if (bucket.get("name").equals("Debug"))
         {
-            bucket_list_view_parent.setBackgroundResource(R.color.yellow);
+            bucket_list_view_parent.setBackgroundColor(Color.BLUE);
+        }
+        else if (bucket.get("name").equals("Error"))
+        {
+            bucket_list_view_parent.setBackgroundColor(Color.YELLOW);
         }
 
     }

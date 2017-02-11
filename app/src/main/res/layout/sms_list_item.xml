@@ -21,7 +21,7 @@
             android:layout_height="wrap_content"
             android:id="@+id/bucket_button"
             style="@style/Widget.AppCompat.Button.Colored"
-            android:background="@color/changeBucketColor"/>
+            android:background="@color/colorPrimaryDark"/>
 
         <TextView
             android:layout_width="match_parent"
@@ -30,7 +30,9 @@
             android:layout_alignParentStart="true"
             android:textAppearance="@android:style/TextAppearance.Material.Widget.TextView.SpinnerItem"
             android:id="@+id/sms_time_textview"
-            android:layout_below="@+id/bucket_button" />
+            android:layout_below="@+id/bucket_button"
+            android:fontFamily="serif-monospace"
+            android:textStyle="normal|italic" />
 
         <TextView
             android:layout_width="match_parent"
@@ -39,7 +41,9 @@
             android:layout_alignParentStart="true"
             android:textAppearance="@android:style/TextAppearance.Material.Widget.TextView.SpinnerItem"
             android:id="@+id/sms_from_textview"
-            android:layout_below="@+id/sms_time_textview" />
+            android:layout_below="@+id/sms_time_textview"
+            android:textSize="18sp"
+            android:fontFamily="sans-serif" />
 
         <TextView
             android:layout_width="match_parent"

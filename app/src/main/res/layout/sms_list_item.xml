@@ -19,7 +19,9 @@
             android:text="Change Bucket"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/bucket_button" />
+            android:id="@+id/bucket_button"
+            style="@style/Widget.AppCompat.Button.Colored"
+            android:background="@color/changeBucketColor"/>
 
         <TextView
             android:layout_width="match_parent"

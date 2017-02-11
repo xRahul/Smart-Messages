@@ -64,8 +64,20 @@ class SmsListItemHolder extends RecyclerView.ViewHolder implements View.OnClickL
         smsTimeTextView.setText(getDate(Long.parseLong(sms.get("time")), "dd/MM/yyyy hh:mm:ss a"));
         smsBucketButton.setText(bucket_names[Integer.parseInt(sms.get("bucketId"))] + " - " + "Change Bucket");
 
-        smsBucketButton.setOnClickListener(this);
+        if (bucket_names[Integer.parseInt(sms.get("bucketId"))] == "Critical") {
+            smsBucketButton.setBackgroundResource(R.color.red);
+        }
+        else if (bucket_names[Integer.parseInt(sms.get("bucketId"))] == "Info") {
+            smsBucketButton.setBackgroundResource(R.color.blue);
+        }
+        else if (bucket_names[Integer.parseInt(sms.get("bucketId"))] == "Debug") {
+            smsBucketButton.setBackgroundResource(R.color.green);
+        }
+        else if (bucket_names[Integer.parseInt(sms.get("bucketId"))] == "Personal") {
+            smsBucketButton.setBackgroundResource(R.color.yellow);
+        }
 
+        smsBucketButton.setOnClickListener(this);
     }
 
     @Override

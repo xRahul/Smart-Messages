@@ -41,6 +41,27 @@ class BucketListItemHolder extends RecyclerView.ViewHolder implements View.OnCli
         // 4. Bind the data to the ViewHolder
         bucketNameTextView.setText(bucket.get("name"));
         bucketCountTextView.setText(bucket.get("count"));
+        if (bucket.get("name") == "Critical")
+        {
+            bucketNameTextView.setBackgroundResource(R.color.red);
+            bucketCountTextView.setBackgroundResource(R.color.red);
+        }
+        else if (bucket.get("name") == "Info")
+        {
+            bucketNameTextView.setBackgroundResource(R.color.blue);
+            bucketCountTextView.setBackgroundResource(R.color.blue);
+        }
+        else if (bucket.get("name") == "Debug")
+        {
+            bucketNameTextView.setBackgroundResource(R.color.green);
+            bucketCountTextView.setBackgroundResource(R.color.green);
+        }
+        else if (bucket.get("name") == "Personal")
+        {
+            bucketNameTextView.setBackgroundResource(R.color.yellow);
+            bucketCountTextView.setBackgroundResource(R.color.yellow);
+        }
+
     }
 
     @Override

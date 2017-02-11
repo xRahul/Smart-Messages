@@ -1,6 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#3F51B5</color>
+    <color name="colorPrimary">#3f51b5</color>
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
+    <color name="changeBucketColor">#8e9df1</color>
+    <color name="red">#f2292c</color>
+    <color name="blue">#2741e7</color>
+    <color name="yellow">#e2e61b</color>
+    <color name="green">#1ee61b</color>
+
 </resources>

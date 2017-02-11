@@ -46,23 +46,23 @@ class BucketListItemHolder extends RecyclerView.ViewHolder implements View.OnCli
 
         if (bucket.get("name").equals("Critical"))
         {
-            bucket_list_view_parent.setBackgroundColor(Color.RED);
+            bucket_list_view_parent.setBackgroundColor(Color.parseColor("#E57373"));
         }
         else if (bucket.get("name").equals("None"))
         {
-            bucket_list_view_parent.setBackgroundColor(Color.GRAY);
+            bucket_list_view_parent.setBackgroundColor(Color.parseColor("#E0E0E0"));
         }
         else if (bucket.get("name").equals("Info"))
         {
-            bucket_list_view_parent.setBackgroundColor(Color.GREEN);
+            bucket_list_view_parent.setBackgroundColor(Color.parseColor("#81C784"));
         }
         else if (bucket.get("name").equals("Debug"))
         {
-            bucket_list_view_parent.setBackgroundColor(Color.BLUE);
+            bucket_list_view_parent.setBackgroundColor(Color.parseColor("#4DD0E1"));
         }
         else if (bucket.get("name").equals("Error"))
         {
-            bucket_list_view_parent.setBackgroundColor(Color.YELLOW);
+            bucket_list_view_parent.setBackgroundColor(Color.parseColor("#FFF176"));
         }
 
     }

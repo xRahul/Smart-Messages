@@ -65,38 +65,31 @@ class SmsListItemHolder extends RecyclerView.ViewHolder implements View.OnClickL
         smsTimeTextView.setText(getDate(Long.parseLong(sms.get("time")), "dd/MM/yyyy hh:mm:ss a"));
         smsBucketButton.setText(bucket_names[Integer.parseInt(sms.get("bucketId"))] + " - " + "Change Bucket");
 
-        if (bucket_names[Integer.parseInt(sms.get("bucketId"))] == "Critical") {
-            smsBucketButton.setBackgroundResource(R.color.red);
-        }
-        else if (bucket_names[Integer.parseInt(sms.get("bucketId"))] == "Info") {
-            smsBucketButton.setBackgroundResource(R.color.blue);
-        }
-        else if (bucket_names[Integer.parseInt(sms.get("bucketId"))] == "Debug") {
-            smsBucketButton.setBackgroundResource(R.color.green);
-        }
-        else if (bucket_names[Integer.parseInt(sms.get("bucketId"))] == "Personal") {
-            smsBucketButton.setBackgroundResource(R.color.yellow);
-        }
 
         if (bucket_names[Integer.parseInt(sms.get("bucketId"))].equals("Critical"))
         {
-            smsBucketButton.setBackgroundColor(Color.RED);
+            smsBucketButton.setBackgroundColor(Color.parseColor("#E57373"));
+            smsBucketButton.setTextColor(Color.parseColor("#000000"));
         }
         else if (bucket_names[Integer.parseInt(sms.get("bucketId"))].equals("None"))
         {
-            smsBucketButton.setBackgroundColor(Color.GRAY);
+            smsBucketButton.setBackgroundColor(Color.parseColor("#E0E0E0"));
+            smsBucketButton.setTextColor(Color.parseColor("#000000"));
         }
         else if (bucket_names[Integer.parseInt(sms.get("bucketId"))].equals("Info"))
         {
-            smsBucketButton.setBackgroundColor(Color.GREEN);
+            smsBucketButton.setBackgroundColor(Color.parseColor("#81C784"));
+            smsBucketButton.setTextColor(Color.parseColor("#000000"));
         }
         else if (bucket_names[Integer.parseInt(sms.get("bucketId"))].equals("Debug"))
         {
-            smsBucketButton.setBackgroundColor(Color.BLUE);
+            smsBucketButton.setBackgroundColor(Color.parseColor("#4DD0E1"));
+            smsBucketButton.setTextColor(Color.parseColor("#000000"));
         }
         else if (bucket_names[Integer.parseInt(sms.get("bucketId"))].equals("Error"))
         {
-            smsBucketButton.setBackgroundColor(Color.YELLOW);
+            smsBucketButton.setBackgroundColor(Color.parseColor("#FFF176"));
+            smsBucketButton.setTextColor(Color.parseColor("#000000"));
         }
 
         smsBucketButton.setOnClickListener(this);

@@ -1,25 +1,25 @@
 package com.shopclues.com.smartmessages;
 
 import android.app.Activity;
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.net.Uri;
+import android.os.Bundle;
+import android.preference.PreferenceFragment;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
-
-import android.content.Context;
-import android.net.Uri;
-import android.os.Bundle;
-import android.support.v4.app.Fragment;
-import android.content.SharedPreferences;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
 import android.widget.TextView;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 
-public class SettingsFragment extends Fragment {
+public class SettingsFragment extends PreferenceFragment {
     Activity activity;
     ListView categoryListView;
     List categories = new ArrayList();

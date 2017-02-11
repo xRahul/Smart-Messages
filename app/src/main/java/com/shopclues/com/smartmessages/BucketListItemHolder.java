@@ -4,6 +4,7 @@ import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.text.SimpleDateFormat;
@@ -15,10 +16,9 @@ class BucketListItemHolder extends RecyclerView.ViewHolder implements View.OnCli
 
     private final TextView bucketNameTextView;
     private final TextView bucketCountTextView;
-
     private Map<String, String> bucket;
     private Context context;
-
+    private final RelativeLayout bucket_list_view_parent;
     BucketListItemHolder(Context contextTemp, View itemView) {
         super(itemView);
 
@@ -28,6 +28,7 @@ class BucketListItemHolder extends RecyclerView.ViewHolder implements View.OnCli
         // 2. Set up the UI widgets of the holder
         bucketNameTextView = (TextView) itemView.findViewById(R.id.bucket_name_textview);
         bucketCountTextView = (TextView) itemView.findViewById(R.id.bucket_count_textview);
+        bucket_list_view_parent = (RelativeLayout) itemView.findViewById(R.id.bucket_list_parent);
 
         // 3. Set the "onClick" listener of the holder
         itemView.setOnClickListener(this);
@@ -41,25 +42,22 @@ class BucketListItemHolder extends RecyclerView.ViewHolder implements View.OnCli
         // 4. Bind the data to the ViewHolder
         bucketNameTextView.setText(bucket.get("name"));
         bucketCountTextView.setText(bucket.get("count"));
+
         if (bucket.get("name") == "Critical")
         {
-            bucketNameTextView.setBackgroundResource(R.color.red);
-            bucketCountTextView.setBackgroundResource(R.color.red);
+            bucket_list_view_parent.setBackgroundResource(R.color.red);
         }
         else if (bucket.get("name") == "Info")
         {
-            bucketNameTextView.setBackgroundResource(R.color.blue);
-            bucketCountTextView.setBackgroundResource(R.color.blue);
+            bucket_list_view_parent.setBackgroundResource(R.color.blue);
         }
         else if (bucket.get("name") == "Debug")
         {
-            bucketNameTextView.setBackgroundResource(R.color.green);
-            bucketCountTextView.setBackgroundResource(R.color.green);
+            bucket_list_view_parent.setBackgroundResource(R.color.green);
         }
         else if (bucket.get("name") == "Personal")
         {
-            bucketNameTextView.setBackgroundResource(R.color.yellow);
-            bucketCountTextView.setBackgroundResource(R.color.yellow);
+            bucket_list_view_parent.setBackgroundResource(R.color.yellow);
         }
 
     }
